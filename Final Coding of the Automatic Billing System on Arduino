@@ -1,0 +1,148 @@
+// Final Coding of the Automatic Billing System on Arduino
+/*This code appears to be part of an Arduino project for a store management system. It uses an RFID reader to scan items and display their prices on an LCD screen. The code includes:
+Setup for Serial communication and LCD display
+RFID data handling with two predefined RFID tags
+A main loop that receives, stores, and prints data
+Logic to toggle items (specifically Balaji Chat priced at Rs. 10) when their RFID tag is scanned
+LCD display functionality to show welcome message and item details*/
+
+#include<SoftwareSerial.h>
+#include<Wire.h>
+#include<LiquidCrystal.h>
+
+SoftwareSerial mySerial(9, 10);
+
+int read_count = 0;
+int i=0, j=0;
+float rs1=0, rs2=0, total;
+int a1=0, a2=0;
+char data_temp;
+RFID_data[12], data_store[12];
+boolean disp_control;
+char data1[13] = {"11004DD7EF64"};
+char data2[13] = {"11004DCA3DAB"};
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup()
+{
+    lcd.begin(16, 2);
+    mySerial.begin(9600);
+    Serial.begin(9600);
+    lcd.setCursor(0,0);
+    lcd.print("Welcome to");
+    lcd.setCursor(0,1);
+    lcd.print("Future Store!");
+}
+
+void loop()
+{
+    RecieveData();
+    StoreData();
+    PrintData();
+
+    //1st item
+    if (compare(data_store, data1, 12, 12) == true)
+    {
+        a1=a1^1;
+        if(a1==1)
+        {
+            rs1=10; Serial.println("10 Rs");
+            lcd.clear(); lcd.setCursor(0,0);
+            lcd.print("Balaji Chat");
+            lcd.setCursor(0,1);
+            lcd.print("Rs. 10");
+        }
+        else
+        {
+            rs1=0;
+            Serial.println("Removed");
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Balaji Chat");
+            lcd.setCursor(0,1);
+            lcd.print("Removed!");
+        }
+    }
+}
+// Functions for RFID-based payment system
+
+void RecieveData() {
+    if (mySerial.available() > 0) {
+        data_temp = mySerial.read();
+        RFID_data[read_count] = data_temp;
+        read_count++;
+    }
+}
+
+void StoreData() {
+    if (read_count == 12) {
+        disp_control = true;
+        
+        for (j = 0; j < 12; j++) {
+            data_store[j] = RFID_data[j];
+        }
+        read_count = 0;
+    }
+}
+
+// Payment processing section
+void processPayment() {
+    // Second item processing
+    if (compare(data_store, data2, 12) == true) {
+        a2 = a2^1;
+        if (a2 == 1) {
+            rs2 = 111.10;
+            Serial.println("111 Rs");
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Subway");
+            lcd.setCursor(0,1);
+            lcd.print("Rs. 111.10");
+        } else {
+            rs2 = 0;
+            Serial.println("Removed");
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Subway");
+            lcd.setCursor(0,1);
+            lcd.print("Removed!");
+        }
+    }
+
+    // Total calculation
+    if (digitalRead(13) == 0) {
+        total = rs1 + rs2 + rs3 + rs4 + rs5 + rs6;
+        Serial.println("Printing Total");
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Total Bill");
+        lcd.setCursor(0,1);
+        lcd.print(total);
+    }
+    
+    data_store[1] = 0;
+}
+if (disp_control == true) 
+{
+    for (j = 0; j < 12; j++) 
+    {
+        Serial.write(data_store[j]);
+    }
+    Serial.println("");
+    disp_control = false;
+}
+
+boolean compare(char *a, char *b, int len_a, int len_b) 
+{
+    int n;
+    
+    if (len_a != len_b)
+        return false;
+        
+    for (n = 0; n < len_a; n++) 
+    {
+        if (a[n] != b[n])
+            return false;
+    }
+    return true;
+}
