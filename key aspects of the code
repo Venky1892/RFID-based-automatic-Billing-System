@@ -1,0 +1,53 @@
+// RFID Reading
+
+//The main loop continuously checks for RFID tags:
+
+//cpp
+if (Serial.available() > 0) {
+  count = 0;
+  while (Serial.available() && count < 12) {
+    input[count] = Serial.read();
+    count++;
+    delay(5);
+  }
+  // Process RFID tag data
+}
+
+
+// This code reads the 12-digit RFID tag data when available.
+
+// Product Identification and Billing
+
+// The code compares the read RFID tag with predefined product codes:
+
+// cpp
+if (input[0] == '5' && input[1] == '5') {
+  // Product 1 logic
+} else if (input[0] == '5' && input[1] == '6') {
+  // Product 2 logic
+}
+// Additional product checks
+
+//When a match is found, it updates the bill amount and displays product information on the LCD:
+
+//cpp
+total = total + 10; // Example price
+lcd.setCursor(0, 1);
+lcd.print("Total: ");
+lcd.print(total);
+
+
+// User Interface
+
+// The code includes functionality for a keypad interface, allowing users to finalize their purchase or remove items:
+
+// cpp
+char key = keypad.getKey();
+if (key == '#') {
+  // Finalize purchase
+} else if (key == '*') {
+  // Remove last item
+}
+
+
+// This comprehensive code integrates RFID reading, product identification, billing calculation, and user interaction to create a functional automatic billing system for the smart shopping trolley.
